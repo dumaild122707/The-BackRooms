@@ -27,6 +27,20 @@
       </div>
     </div>
     <script>
+      // Инициализация VK Bridge
+      if (typeof vkBridge !== 'undefined') {
+        vkBridge.send('VKWebAppInit', {})
+          .then(function(data) {
+            console.log('VK Bridge инициализирован:', data);
+          })
+          .catch(function(error) {
+            console.error('Ошибка инициализации VK:', error);
+          });
+      } else {
+        console.warn('VK Bridge не найден');
+      }
+
+      // Дальше стандартный код загрузки Unity
       var canvas = document.querySelector("#unity-canvas");
 
       function unityShowBanner(msg, type) {
@@ -86,30 +100,6 @@
           document.querySelector("#unity-fullscreen-button").onclick = () => {
             unityInstance.SetFullscreen(1);
           };
-// ===== ИНИЦИАЛИЗАЦИЯ VK ПОСЛЕ ЗАГРУЗКИ UNITY =====
-          if (typeof vkBridge !== 'undefined') {
-            vkBridge.send('VKWebAppInit', {})
-              .then(function(data) {
-                console.log('VK Bridge инициализирован:', data);
-                // Отправляем событие в Unity
-                if (unityInstance) {
-                  unityInstance.SendMessage('VKBridge', 'OnVKBridgeInitSuccess');
-                }
-              })
-              .catch(function(error) {
-                console.error('Ошибка инициализации VK:', error);
-                if (unityInstance) {
-                  unityInstance.SendMessage('VKBridge', 'OnVKBridgeInitError', 'Ошибка инициализации VK');
-                }
-              });
-          } else {
-            console.warn('VK Bridge не найден');
-            if (unityInstance) {
-              unityInstance.SendMessage('VKBridge', 'OnVKBridgeInitError', 'VK Bridge не найден');
-            }
-          }
-          // ===============================================
-
         }).catch((message) => {
           alert(message);
         });
